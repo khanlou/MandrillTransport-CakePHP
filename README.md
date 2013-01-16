@@ -21,14 +21,15 @@ This enables using CakeEmail from CakePHP 2.0 with Mandrill.
 Usage is based on the `CakeEmail` class and specification.
 
 	$email = new CakeEmail();
-	$email->config('mandrill');
-	
-	
+	$email->config('mandrill');	
 	$email->from('noreply@yourapp.com');
 	$email->to('email@domain.com');
 	$email->subject('Subject for Email');
 	$result = $email->send('Here is some test content for the email.');
 	
-The `$result` object will contain information about the message sending.
+The `$result` object will contain information about the success or failure of the message sending.
 
-It's very simple right now and doesn't support complex things like multiple recipients or attachments.
+It's very simple right now and doesn't support anything more complex, like multiple recipients or attachments.
+
+
+© Soroush Khanlou 2013
