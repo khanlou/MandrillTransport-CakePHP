@@ -20,13 +20,19 @@ This enables using CakeEmail from CakePHP 2.0 with Mandrill.
 
 Usage is based on the `CakeEmail` class and specification.
 
+To use, import the `CakeEmail` class:
+
+	App::uses('CakeEmail', 'Network/Email');
+	
+and use it like so when you want to send an email.
+
 	$email = new CakeEmail();
 	$email->config('mandrill');	
 	$email->from('noreply@yourapp.com');
 	$email->to('email@domain.com');
 	$email->subject('Subject for Email');
 	$result = $email->send('Here is some test content for the email.');
-	
+
 The `$result` object will contain information about the success or failure of the message sending.
 
 It's very simple right now and doesn't support anything more complex, like multiple recipients or attachments.
