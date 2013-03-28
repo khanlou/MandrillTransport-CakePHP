@@ -50,7 +50,6 @@ class MandrillTransport extends AbstractTransport {
  * @return array Return the Mandrill
  */
 	public function send(CakeEmail $email) {
-		// CakeEmail
 		$this->_cakeEmail = $email;
 
 		$this->_config = $this->_cakeEmail->config();
@@ -59,18 +58,26 @@ class MandrillTransport extends AbstractTransport {
 		// Setup connection
 		$this->__mandrillConnection = &new HttpSocket();
 
-		// Build message
 		$message = $this->__buildMessage();
 		
-		// Build request
-		$request = $this->__buildRequest();
-
-		$message_send_uri = $this->_config['uri'] . "messages/send.json";
+		$request = array(
+			'header' => array(
+				'Accept' => 'application/json',
+				'Content-Type' => 'application/json',
+			)
+		);
 		
-		// Send message
-		$returnMandrill = $this->__mandrillConnection->post($message_send_uri, json_encode($message), $request);
+		if ($this->_cakeEmail->template) {
+			$message_send_uri = $this->_config['uri'] . "messages/send-template.json";
+		} else {
+			$message_send_uri = $this->_config['uri'] . "messages/send.json";
+		}
 		
-		// Return data
+		//perform the http connection
+/* 		$returnMandrill = $this->__mandrillConnection->post($message_send_uri, json_encode($message), $request); */
+		
+		
+		//parse mandrill results
 		$result = json_decode($returnMandrill, true);
 				
 		$headers = $this->_headersToString($this->_headers);
@@ -84,36 +91,44 @@ class MandrillTransport extends AbstractTransport {
  * @return array
  */
 	private function __buildMessage() {
-		// Message
 		
 		$json = array();
 		$json["key"] = $this->_config['key'];
+		if ($this->_cakeEmail->template) {
+			$json["template_name"] = $this->_cakeEmail->template;
+			$json["template_content"] = array();
+		}
 
 		$message = array();
+		
+		$_merge_vars = array();
+		foreach ($this->_cakeEmail->viewVars as $key => $mergeVar) {
+			$_merge_vars[] = array("name" => $key, "content" => $mergeVar);
+		}
+		
+		$message["merge_vars"] = array();
+		$message["merge_vars"][] = array("rcpt" => $this->_headers['To'],
+										"vars" => $_merge_vars);
+
+
 				
-		// From
 		$message['from_email'] = $this->_headers['From'];
 
-		// To
 		$message["to"] = array(
 			array("email" => $this->_headers['To'])
 		);
 
 
-		// Subject
 		$message['subject'] = mb_decode_mimeheader($this->_headers['Subject']);
 
 
-		// HtmlBody
 		if ($this->_cakeEmail->emailFormat() === 'html' || $this->_cakeEmail->emailFormat() === 'both') {
-			$message['html'] = $this->_cakeEmail->message('html');
+			$message['html'] = $this->_cakeEmail->viewVars["MESSAGE_TEXT"];
 		}
 
-		// TextBody
 		if ($this->_cakeEmail->emailFormat() === 'text' || $this->_cakeEmail->emailFormat() === 'both') {
-			$message['text'] = $this->_cakeEmail->message('text');
+			$message['text'] = $this->_cakeEmail->viewVars["MESSAGE_TEXT"];
 		}
-		
 		
 		$json["message"] = $message;
 
@@ -122,20 +137,5 @@ class MandrillTransport extends AbstractTransport {
 	}
 
 
-/**
- * Build request
- *
- * @return array
- */
-	private function __buildRequest () {
-		$request = array(
-			'header' => array(
-				'Accept' => 'application/json',
-				'Content-Type' => 'application/json',
-			)
-		);
-
-		return $request;
-	}
 
 }
