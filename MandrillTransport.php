@@ -74,7 +74,7 @@ class MandrillTransport extends AbstractTransport {
 		}
 		
 		//perform the http connection
-/* 		$returnMandrill = $this->__mandrillConnection->post($message_send_uri, json_encode($message), $request); */
+		$returnMandrill = $this->__mandrillConnection->post($message_send_uri, json_encode($message), $request);
 		
 		
 		//parse mandrill results
