@@ -69,7 +69,7 @@ class MandrillTransport extends AbstractTransport
 			)
 		);
 
-		if ($this->_cakeEmail->template()['template']) {
+		if ($this->_cakeEmail->template()) {
 			$message_send_uri = $this->_config['uri'] . "messages/send-template.json";
 		} else {
 			$message_send_uri = $this->_config['uri'] . "messages/send.json";
